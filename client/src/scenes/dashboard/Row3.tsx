@@ -10,16 +10,23 @@ import FlexBetween from '@/components/FlexBetween';
 import { Cell, Pie, PieChart } from "recharts";
 import { useMemo } from "react";
 
+/* Row3 컴포넌트를 정의합니다. */
 const Row3 = () => {
 
+  /* //테마와 API 쿼리 훅을 사용하여 스타일과 데이터를 가져옵니다. */
   const { data: kpiData } = useGetKpisQuery();
   const { data: productData } = useGetProductsQuery();
   const { data: transactionData } = useGetTransactionQuery();
   const { palette } = useTheme();
+
+  /* piechart의 색상 정의 */
   const pieColors = [palette.primary[800], palette.primary[500]];
 
+  /* piechart의 데이터를 메모이제이션하여 계산 */
   const pieChartData = useMemo(() => {
     if (kpiData) {
+      
+      /* 총 비용을 구하고 각 카테고리별 비용을 계산 */
       const totalExpenses = kpiData[0].totalExpenses;
       return Object.entries(kpiData[0].expensesByCategory).map(
         ([key, value]) => {
@@ -38,6 +45,7 @@ const Row3 = () => {
     }
   }, [kpiData]);
 
+  /* 제품 목록을 위한 컬럼을 정의 */
   const productColumns = [
     {
       field : "_id",
@@ -58,6 +66,7 @@ const Row3 = () => {
     }    
   ]
 
+  /* 트랜잭션을 위한 컬럼 정의 */
   const transactionColumns = [
     {
       field: "_id",
@@ -89,8 +98,8 @@ const Row3 = () => {
     <>
       <DashboardBox  gridArea="g">
         <BoxHeader 
-         title="List of Products"
-         sideText={`${productData?.length} products`}
+         title="제품 목록"
+         sideText={`${productData?.length} 개의제품`}
         />
         <Box
           mt="0.5rem"
@@ -123,8 +132,8 @@ const Row3 = () => {
       </DashboardBox>
       <DashboardBox  gridArea="h">
       <BoxHeader
-          title="Recent Orders"
-          sideText={`${transactionData?.length} latest transactions`}
+          title="최근 주문"
+          sideText={`${transactionData?.length} 개의 최근 트랜잭션`}
         />
         <Box
           mt="1rem"
@@ -156,7 +165,7 @@ const Row3 = () => {
         </Box>
       </DashboardBox>
       <DashboardBox  gridArea="i">
-        <BoxHeader title="Expense Breakdown By Category" sideText="+4%" />
+        <BoxHeader title="카테고리별 비용 내용" sideText="+4%" />
           <FlexBetween mt="0.5rem" gap="0.5rem" p="0 1rem" textAlign="center">
           {pieChartData?.map((data, i) => (
             <Box key={`${data[0].name}-${i}`}>
@@ -180,7 +189,7 @@ const Row3 = () => {
           </FlexBetween>
       </DashboardBox>
       <DashboardBox  gridArea="j">
-        <BoxHeader title="Overall Summary and Explanation Data" sideText="+15%" />
+        <BoxHeader title="전체 요약 및 설명 데이터" sideText="+15%" />
          <Box
           height="15px"
           margin="1.25rem 1rem 0.4rem 1rem"
