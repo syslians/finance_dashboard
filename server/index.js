@@ -33,8 +33,8 @@ app.use("/transaction", transactionRoutes);
 console.log("hello");
 
 /* mongoose setup */
-const mongo = process.env.MONGO_URL
-const PORT = process.env.PORT;
+const mongo = "mongodb+srv://tonynala97:gu56417974@cluster0.3gdvazf.mongodb.net/?retryWrites=true&w=majority"
+const PORT = 8080;
 console.log(mongo)
 console.log(PORT)
 mongoose
