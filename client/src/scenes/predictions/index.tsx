@@ -24,6 +24,7 @@ const Predictions = () => {
   const formattedData = useMemo(() => {
     if (!kpiData) return [];
     const monthData = kpiData[0].monthlyData;
+
     console.log("monthData:",monthData);
 
     const formatted: Array<DataPoint> = monthData.map(
@@ -38,9 +39,9 @@ const Predictions = () => {
       
       return {
         name: month,
-        "Actual Revenue": revenue,
-        "Regression Line": regressionLine.points[i][1],
-        "Predicted Revenue": regressionLine.predict(i + 12)[1],
+        "실제 매출": revenue,
+        "선형 회귀": regressionLine.points[i][1], // i는 달, [1]은 revenue
+        "예상 매출": regressionLine.predict(i + 12)[1], 
       };
     });
   }, [kpiData]); 
@@ -50,9 +51,9 @@ const Predictions = () => {
     <DashboardBox width="100%" height="100%" p="1rem" overflow="hidden">
       <FlexBetween m="1rem 2.5rem" gap="1rem">
         <Box>
-          <Typography variant="h3">실수입 및 예상 수입</Typography>
+          <Typography variant="h3">현재매출 및 1년뒤 예상 매출</Typography>
           <Typography variant="h6">
-          단순 선형에 기반한 차트화된 수익 및 예측 수익 회귀 모형
+          단순 선형에 기반한 차트화된 매출 및 예측매출 회귀 모델
           </Typography>
         </Box>
         <Button
@@ -63,7 +64,7 @@ const Predictions = () => {
             boxShadow: "0.1rem 0.1rem 0.1rem 0.1rem rgba(0,0,0,.4)",
           }}
         >
-          Show Predicted Revenue for Next Year
+          내년 예상매출 확인
         </Button>
       </FlexBetween>
       <ResponsiveContainer width="100%" height="100%">
@@ -97,21 +98,21 @@ const Predictions = () => {
           <Legend verticalAlign="top" />
           <Line
             type="monotone"
-            dataKey="Actual Revenue"
+            dataKey="실제 매출"
             stroke={palette.primary.main}
             strokeWidth={0}
             dot={{ strokeWidth: 5 }}
           />
           <Line
             type="monotone"
-            dataKey="Regression Line"
+            dataKey="선형 회귀"
             stroke="#8884d8"
             dot={false}
           />
           {isPredictions && (
             <Line
               strokeDasharray="5 5"
-              dataKey="Predicted Revenue"
+              dataKey="예상 매출"
               stroke={palette.secondary[500]}
             />
           )}

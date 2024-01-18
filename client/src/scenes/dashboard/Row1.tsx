@@ -21,7 +21,7 @@ import BoxHeader from '@/components/BoxHeader';
 이 코드는 세 가지 주요 대시보드 박스를 구현합니다. 첫 번째 박스에서는 영역 차트를 사용하여 수익과 비용을 시각화하고, 
 두 번째 박스에서는 선형 차트로 수익과 이익을 표시합니다. 마지막으로 세 번째 박스에서는 막대 차트를 사용하여 월별 수익을 나타냅니다. 
 각 차트는 recharts 라이브러리를 사용하며, MUI의 테마와 스타일을 적용하여 UI를 구성합니다. 데이터는 API 호출을 통해 가져오며, 
-useMemo 훅을 사용하여 필요한 형태로 가공합니다.
+useMemo 훅을 사용하여 필요한 형태로 가공하고 계산하는 부분은 data가 변하지 않는한 계산된 메모이제이션된 값을 사용합니다.
 */
 
 /*props 데이터 타입 정의*/
@@ -32,20 +32,23 @@ const Row1 = (props: Props) => {
   const { palette } = useTheme(); /* MUI 테마사용 */
   const { data } = useGetKpisQuery(); /* API 호출을 통해 KPI 데이터 가져오기 */
 
-  console.log("data:",data);
+  console.log("KPI 데이터:",data);
 
-  /* 수익 데이터를 메모이제이션 합니다. */
+  /* 수익 데이터를 메모이제이션. mothlydata에서 month, revenue 추출 하여 name: , revenue: 리턴. month는 앞의 3글자만 추출
+     ex: January = Jan*/
+  // monthlydata: [{month: , revenue: , expense: , nonOperationalExpenses: , operationalExpenses: , revenue: , _id: }, {}, {}]
   const revenue = useMemo(() => {
     return(
       data &&
       data[0].monthlyData.map(({ month, revenue }) => {
         return {
-          name: month.substring(0, 3),
-          revenue: revenue,
+          name: month.substring(0, 3), 
+          매출: revenue,
         };
       })
     );  
   }, [data]);
+  console.log("revenue:", revenue);
 
   /* 수익과 비용 데이터를 메모이제이션하여 계산합니다 */
   const revenueExpenses = useMemo(() => {
@@ -54,40 +57,42 @@ const Row1 = (props: Props) => {
       data[0].monthlyData.map(({ month, revenue, expenses }) => {
         return {
           name: month.substring(0, 3),
-          revenue: revenue,
-          expenses: expenses,
+          매출: revenue,
+          비용: expenses,
         };
       })
     );  
   }, [data]);
+  console.log("revenueExpenses" ,revenueExpenses);
 
-  /* 수익과 비용 데이터를 메모이제이션하여 계산합니다 */
+  /* 수익과 비용 데이터를 메모이제이션 */
   const revenueProfit = useMemo(() => {
     return(
       data &&
       data[0].monthlyData.map(({ month, revenue, expenses }) => {
         return {
           name: month.substring(0, 3),
-          revenue: revenue,
-          profit:(revenue - expenses).toFixed(2),
+          매출: revenue,
+          순이익:(revenue - expenses).toFixed(2), // 순이익 계산. 총 수입 - 비용
         };
       })
     );  
   }, [data]);
+  console.log("revenueProfit:" ,revenueProfit);
 
 
   return (
     <>
-    <DashboardBox  gridArea="a">
+    <DashboardBox gridArea="a">
     <BoxHeader 
-     title="수익 및 비용"
+     title="매출 및 비용"
      subtitle="상단 항목은 수익을 나타내며, 하단 항목은 비용을 나타냅니다."
      sideText="+4%"
     />
     <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           width={500}
-          height={400}
+          height={400} 
           data={revenueExpenses}
           margin={{
             top: 15,
@@ -101,7 +106,7 @@ const Row1 = (props: Props) => {
               <stop 
               offset="5%" 
               stopColor={palette.primary[300]} 
-              stopOpacity={0.5} 
+              stopOpacity={2.0} 
               />
               <stop 
               offset="95%" 
@@ -137,14 +142,14 @@ const Row1 = (props: Props) => {
           <Tooltip />
           <Area
           type="monotone"
-          dataKey="revenue" 
+          dataKey="매출" 
           dot={true}
           stroke={palette.primary.main}
           fillOpacity={1} 
           fill="url(#colorRevenue)" />
           <Area
           type="monotone"
-          dataKey="expenses" 
+          dataKey="비용" 
           dot={true}
           stroke={palette.primary.main}
           fillOpacity={1} 
@@ -155,8 +160,8 @@ const Row1 = (props: Props) => {
 
     <DashboardBox  gridArea="b">
     <BoxHeader 
-     title="수익 및 비용"
-     subtitle="상단 항목은 수익을 나타내며, 하단 항목은 비용을 나타냅니다."
+     title="매출 및 순이익"
+     subtitle="상단 항목은 매출 나타내며, 하단 항목은 순이익을 나타냅니다."
      sideText="+4%"
     />
     <ResponsiveContainer width="100%" height="100%">
@@ -200,13 +205,13 @@ const Row1 = (props: Props) => {
           <Line
               yAxisId="left"
               type="monotone"
-              dataKey="profit"
+              dataKey="순이익"
               stroke={palette.tertiary[500]}
             />
             <Line
               yAxisId="right"
               type="monotone"
-              dataKey="revenue"
+              dataKey="매출"
               stroke={palette.primary.main}
             />
         </LineChart>
@@ -214,8 +219,8 @@ const Row1 = (props: Props) => {
     </DashboardBox>
     <DashboardBox  gridArea="c">
     <BoxHeader 
-     title="월별 수익"
-     subtitle="월별 수익 그래프"
+     title="월별 매출"
+     subtitle="월별 매출 그래프"
      sideText="+4%"
     />
     <ResponsiveContainer width="100%" height="100%">     
@@ -257,7 +262,7 @@ const Row1 = (props: Props) => {
             style={{ fontSize: "10px" }}
           />
           <Tooltip />
-          <Bar dataKey="revenue" fill="url(#colorRevenue)" />
+          <Bar dataKey="매출" fill="url(#colorRevenue)" />
         </BarChart>
     </ResponsiveContainer>
     </DashboardBox>

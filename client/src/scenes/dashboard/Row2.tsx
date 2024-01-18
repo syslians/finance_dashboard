@@ -19,6 +19,7 @@ import {
   Scatter,
   ZAxis
 } from "recharts";
+
 /*
 위 코드에서 DashboardBox는 대시보드의 각 섹션을 구성하는 컨테이너 역할을 합니다. 
 BoxHeader는 각 섹션의 헤더를 정의하며, FlexBetween은 자식 요소들을 공간을 균등하게 나눠서 배치하는 데 사용됩니다. 
@@ -41,9 +42,12 @@ const Row2 = () => {
   const { palette } = useTheme();
   const pieColors = [palette.grey[800], palette.primary[300]]
 
-  /* API에서 데이터를 가져옵니다 */
+  /* API에서 데이터를 grab. data를 각각 다른 알맞는 변수명으로 맵핑  */
   const { data:operationalData } = useGetKpisQuery();
   const { data: productData } = useGetProductsQuery();
+
+  console.log("operationalData" ,operationalData);
+  console.log("productdata", productData);
 
   /* 데이터를 메모이제이션하여 차트에 사용할 데이터를 준비합니다 */
   const operationalExpenses = useMemo(() => {
@@ -53,15 +57,15 @@ const Row2 = () => {
         ({ month, operationalExpenses, nonOperationalExpenses }) => {
           return {
             name: month.substring(0, 3),
-            "Operational Expenses": operationalExpenses,
-            "Non Operational Expenses": nonOperationalExpenses,
+            "운영비용": operationalExpenses,
+            "비운영비용": nonOperationalExpenses,
           };
         }
       )
     );
   }, [operationalData]);
 
-  /* 상품 데이터를 메모이제이션하여 ScatterChart에 사용할 데이터를 준비합니다. */
+  /* 상품 데이터를 메모이제이션하여 ScatterChart에 사용할 데이터를 준비. */
   const productExpenseData = useMemo(() => {
     return (
       productData &&
@@ -81,7 +85,7 @@ const Row2 = () => {
     {/* 운영 비용 대비 비운영 비용을 보여주는 LineChart를 포함하는 대시보드 박스 */}
     <DashboardBox  gridArea="d">
     <BoxHeader
-          title="운영비용 vs 비운영비용"
+          title="운영비용 vs 운영외비용"
           sideText="+4%"
         />
         {/* LineChart를 ResponsiveContainer로 감싸 반응형으로 만듭니다. */}
@@ -119,13 +123,13 @@ const Row2 = () => {
             <Line
               yAxisId="left"
               type="monotone"
-              dataKey="Non Operational Expenses"
+              dataKey="비운영비용"
               stroke={palette.tertiary[500]}
             />
             <Line
               yAxisId="right"
               type="monotone"
-              dataKey="Operational Expenses"
+              dataKey="운영비용"
               stroke={palette.primary.main}
             />
           </LineChart>
@@ -184,7 +188,7 @@ const Row2 = () => {
      {/* 상품 가격 대비 비용을 보여주는 ScatterChart를 포함하는 대시보드 박스 */}
     <DashboardBox  gridArea="f">
     {/* ScatterChart를 ResponsiveContainer로 감싸 반응형으로 만듭니다. */}
-    <BoxHeader title="제품 가격 vs 비용" sideText="+4%" />
+    <BoxHeader title="판매가 및 비용" sideText="+4%" />
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart
             margin={{

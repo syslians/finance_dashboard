@@ -9,7 +9,7 @@ Dashbaord 컴포넌트는 useMediaQuery 훅을 사용하여 화면 크기에 따
 Box 컴포넌트의 sx 속성을 통해 CSS 스타일을 동적으로 적용하여 반응형 레이아웃을 구성합니다.
 */
 
-/* 대형화면과 소형화면에 대한 그리드 레이아웃 설정 */
+/* 1200px 이상일때의 그리드 */
 const gridTemplateLargeScreens = `
   "a b c"
   "a b c"
@@ -22,6 +22,8 @@ const gridTemplateLargeScreens = `
   "g h j"
   "g h j"
   `;
+
+  /* 1200px 이하일때의 그리드 */
 const gridTemplateSmallScreens = `
   "a"
   "a"
@@ -58,8 +60,10 @@ const gridTemplateSmallScreens = `
 const Dashbaord = () => {
    /* 화면 크기에 따라 레이아웃을 변경하기 위해 미디어 쿼리를 사용 */
   const isAboveMediumScreens = useMediaQuery("(min-width: 1200px)")
+
   return (
-        /* Box 컴포넌트를 사용하여 그리드 레이아웃을 설정 */
+    /* Box 컴포넌트를 사용하여 그리드 레이아웃을 설정.
+        화면의 크기에 따라 반응형으로 렌더링 if 1200px 대형화면 그리드. else 소형화면 그리드 */
     <Box width="100%" height="100%" display="grid" gap="1.5rem"
     sx={
       isAboveMediumScreens ? {
